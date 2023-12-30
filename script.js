@@ -2,37 +2,7 @@ const inputZip = "";
 const inputCountryCode = "";
 var mood;
 var gender;
-var tops = {
-    longSleeve: "Long Sleeve",
-    shortSleeve: "Short Sleeve",
-    warmSweater: "Warm Sweater",
-    lightSweater: "Light Sweater",
-    tankTop: "Tank Top"
-};
-var bottoms = {
-    shorts: "Shorts",
-    skirt: "Skirt",
-    leggings: "Leggings",
-    swatpants: "Sweatpants",
-    jeans: "Jeans",
-    dressPants: "Dress Pants",
-    cargo: "Cargo Pants"
 
-};
-var coats = {
-    lightJacket: "Light Jacket",
-    heavyJacket: "Heavy Jacket",
-    sweatshirt: "Sweatshirt",
-    hoodie: "Hoodie",
-    winterCoat: "Winter Coat",
-    rainJacket: "Rain Jacket"
-};
-var accesories = {
-    winterHat: "Winter Hat",
-    sunHat: "Sun Hat",
-    scarf: "Scarf",
-    gloves: "Gloves"
-};
 const geoURL= "http://api.openweathermap.org/geo/1.0/zip";
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather";
 const apiKey = "4d5bfce61bb0bfcb407e7e53221ed5d0"
