@@ -2,15 +2,15 @@
 ## 12/2023:
 1. Language and Environment:
   - JavaScript, HTML, CSS, VSCode
-1. Product:
+2. Product:
   - Website
-1. Possible Tools:
+3. Possible Tools:
   - Figma
   - Node.js
   - npm
   - express
   - cors
-1. Process:
+4. Process:
   - User inputs 2 things and presses get Rec button (HTML)
     - Zip Code
     - 2 letter country code
@@ -50,74 +50,73 @@
        - Winter Coat, or heavy jacket
        - Long Sleeve and Hoodie or Sweater and Hat
        - Heavy Long Pants
-Cold: 33°F- 47°F
-Layers:
-Heavy Jacket, or Heavy Sweatshirt 
-Long Sleeve, or Sweater 
-Light Long Pants
-Mild: 48°F - 55°F
-Layers:
-Short sleeve with Light Jacket or Sweatshirt, Long Sleeve, or Sweater 
-Light Long Pants
-Moderate: 56°F - 64°F
-Warm: 65°F - 75°F
-Very warm: 76°F - 86°F
-Hot: 87°F - 99°F
-Very hot: above 100°F
-For gender (Toggle?) or buisness/ casual use boolean
+     - Cold: 33°F - 47°F
+       - Layers
+       - Heavy Jacket, or Heavy Sweatshirt
+       - Long Sleeve, or Sweater
+       - Light Long Pants
+     - Mild: 48°F - 55°F
+       - Layers
+       - Short sleeve with Light Jacket or Sweatshirt, Long Sleeve, or Sweater
+       - Light Long Pants
+     - Moderate: 56°F - 64°F
+     - Warm: 65°F - 75°F
+     - Very warm: 76°F - 86°F
+     - Hot: 87°F - 99°F
+     - Very hot: above 100°F
+5. For gender (Toggle?) or buisness/ casual use boolean
 ## 10/2023:
 1. Info needed from API:
    - Latitude and Longitude to get weather info
-Temp
-What temp feels like
-Temp min and max
-Wind
-Cloudy? Sunny? Rainy?
-Jackson: Java to Json 
-Use to get info from API to JSON
-Postman?:
-Use to manage API?
+   - Temp
+   - What temp feels like
+   - Temp min and max
+   - Wind
+   - Cloudy? Sunny? Rainy?
+2. Jackson: Java to Json
+   - Use to get info from API to JSON
+3. Postman?:
+   - Use to manage API?
 ## 09/2023:
-Language and Environment:
-Java, Intellij
-Product:
-GUI
-Weather API:
- Open Weather 
-User Accounts: 
-To set up preferences, like if person runs cold or hot
-Gender for clothing rec?
-Maybe ask ab Style?
-Schedule, if at work suggest business casual 
-Clothing restrictions
-Dresscode
-Dislike items of clothing (skirts, jeans,...)
-Like and Dislike recommendations and save info
-Tabs to suggest clothing recommendations
-Indoors/Outdoors
-Active/Inactive
-Clothing Options:
-Bottoms:
-Shorts
-Skirt
-Light Long Pants
-Heavy Long Pants
-Top:
-Long Sleeve
-Short Sleeve
-Tank Top
-Sweater
-Outerwear:
-Light Jacket
-Heavy Jacket
-Sweatshirt
-Winter Coat
-Rain Jacket
-Accesories:
-Winter Hat
-Sun Hat
-Scarf 
-Gloves
-Questions:
-Are indoor and outdoor temps related?
-Are outfits based on weather or dress code?
+1. Language and Environment:
+  - Java, Intellij
+2. Product:
+  - GUI
+3. Weather API:
+  - Open Weather 
+4. User Accounts: 
+  - To set up preferences, like if person runs cold or hot
+  - Gender for clothing rec?
+    - Maybe ask ab Style?
+  - Schedule, if at work suggest business casual 
+  - Clothing restrictions
+    - Dresscode
+    - Dislike items of clothing (skirts, jeans,...)
+  - Like and Dislike recommendations and save info
+5. Tabs to suggest clothing recommendations
+  - Indoors/Outdoors
+  - Active/Inactive
+6. Clothing Options:
+  - Bottoms:
+   - Shorts
+   - Skirt
+   - Light Long Pants
+   - Heavy Long Pants
+  - Top:
+    - Long Sleeve
+    - Short Sleeve
+    - Tank Top
+    - Sweater
+  - Outerwear:
+    - Light Jacket
+    - Heavy Jacket
+    - Sweatshirt
+    - Winter Coat
+    - Rain Jacket
+  - Accesories:
+    - Winter Hat
+    - Sun Hat
+    - Scarf 
+    - Gloves
+7. Questions:
+  - Are indoor and outdoor temps related? Are outfits based on weather or dress code?
