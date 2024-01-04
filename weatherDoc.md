@@ -18,38 +18,38 @@
   - getRec() needs to read in user input for Geo Call to get lat and lon then get weather info from second api call 
     - maybe it calls getGeo() and that gets lat and lon then calls getRec()??
  - Get rec needs to then get a recommendation of what to wear
-Get weather of day average:
-(Min + max / 2) + feels like + temp / 3 = avg
-Windspeed affect:
-Calm (0-3.45 mph): no affect
-Light Breeze (3.46 - 6.90 mph): -2°F
-Gentle Breeze (6.91 - 11.50 mph): -4°F
-Moderate Breeze (11.51 - 18.40 mph): -6°F
-Fresh Breeze (18.41- 24.20 mph):  -8°F
-Strong Breeze (24.21 - 31.10 mph): -10°F
-Above Strong Breeze (<=31.11 mph): -12°F
-Description Contains:
-Thunderstorm: -3°F and rain jacket
-Drizzle: -3°F and rain jacket
-Rain: -3°F and rain jacket
-Snow: -5°F and winter jacket
-Clear: +5°F
-Few clouds: +2°F
-Scattered clouds: +1°F
-Broken clouds: no affect
-Overcast clouds: -1°F
-What to Wear (Subjective to me):
-Absolutely Freezing: below 20°F 
-Layers (everything covered):
-Winter Coat
-Long Sleeve and Hoodie, or warm Sweater and Hat and scarf
-Gloves
-Heavy Long Pants
-Freezing: 20°F - 32°F
-Layers (most things should be covered):
-Winter Coat, or heavy jacket
-Long Sleeve and Hoodie or Sweater and Hat 
-Heavy Long Pants
+ - Get weather of day average:
+   - (Min + max / 2) + feels like + temp / 3 = avg
+     - Windspeed affect:
+       - Calm (0-3.45 mph): no affect
+       - Light Breeze (3.46 - 6.90 mph): -2°F
+       - Gentle Breeze (6.91 - 11.50 mph): -4°F
+       - Moderate Breeze (11.51 - 18.40 mph): -6°F
+       - Fresh Breeze (18.41- 24.20 mph):  -8°F
+       - Strong Breeze (24.21 - 31.10 mph): -10°F
+       - Above Strong Breeze (<=31.11 mph): -12°F
+     - Description Contains:
+       - Thunderstorm: -3°F and rain jacket
+       - Drizzle: -3°F and rain jacket
+       - Rain: -3°F and rain jacket
+       - Snow: -5°F and winter jacket
+       - Clear: +5°F
+       - Few clouds: +2°F
+       - Scattered clouds: +1°F
+       - Broken clouds: no affect
+       - Overcast clouds: -1°F
+   - What to Wear (Subjective to me):
+     - Absolutely Freezing: below 20°F
+       - Layers (everything covered)
+       - Winter Coat
+       - Long Sleeve and Hoodie, or warm Sweater and Hat and scarf
+       - Gloves
+       - Heavy Long Pants
+     - Freezing: 20°F - 32°F
+       - Layers (most things should be covered)
+       - Winter Coat, or heavy jacket
+       - Long Sleeve and Hoodie or Sweater and Hat
+       - Heavy Long Pants
 Cold: 33°F- 47°F
 Layers:
 Heavy Jacket, or Heavy Sweatshirt 
@@ -65,9 +65,9 @@ Very warm: 76°F - 86°F
 Hot: 87°F - 99°F
 Very hot: above 100°F
 For gender (Toggle?) or buisness/ casual use boolean
-10/2023:
-Info needed from API:
-Latitude and Longitude to get weather info
+## 10/2023:
+1. Info needed from API:
+   - Latitude and Longitude to get weather info
 Temp
 What temp feels like
 Temp min and max
@@ -77,7 +77,7 @@ Jackson: Java to Json
 Use to get info from API to JSON
 Postman?:
 Use to manage API?
-09/2023:
+## 09/2023:
 Language and Environment:
 Java, Intellij
 Product:
