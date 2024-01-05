@@ -1,84 +1,89 @@
-const inputZip = "";
-const inputCountryCode = "";
+var inputZip = "";
+var inputCountryCode = "";
 var mood;
 var gender;
+const data = {};
 
 const geoURL= "http://api.openweathermap.org/geo/1.0/zip";
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather";
-const apiKey = ""
+const apiKey = "4d5bfce61bb0bfcb407e7e53221ed5d0"
 const outputGeoElement = document.getElementById("weather-output");
-function keyPress(event){
-    if (event.key == "Enter"){
-        getInput();
 
-    }
+//this saves the input to the name after each letter typed
+function handleInput(temp){
+    data[temp.name] = temp.value
 }
 
-// add action listener to wait for user input
-document.getElementById("inputZip").addEventListener("keyup", keyPress);
-document.getElementById("inputCountryCode").addEventListener("keyup", keyPress);   
-        
-// functions to add prefrences 
-function choose(choice){
-    mood = choice;
-}
-function choose2(choice){
-    gender = choice;
+function submitInput(){
+    inputZip = data.zip;
+    inputCountryCode = data.cCode;
+    // console.log(inputCountryCode);
+    // console.log(inputZip);
 }
 
 
 
-function getInput(){
-    //get and log input
-    const inputZip =  document.getElementById("inputZip").value;
-    const inputCountryCode = document.getElementById("inputCountryCode").value;
-    console.log("Input Zip: ", inputZip, "Input Country Code: ", inputCountryCode);
+
+
+function getGeo(){
+    //zip and cCode input for URL
+    inputZip = data.zip;
+    inputCountryCode = data.cCode;
+    // console.log(inputCountryCode);
+    // console.log(inputZip);
+    //console.log("Input Zip: ", inputZip, "Input Country Code: ", inputCountryCode);
     //Define geo URL
-    const geoURLFull = geoURL + "?zip=" + inputZip + "," + inputCountryCode + "&appid=" + apiKey;
-}
-
-const getRec = async function(){
-    getInput()
-    //GET request from API, fetch rerturns promise
-    const result = fetch(geoURLFull)
-    //then to handle response validity
-    .then(response =>{
+    var geoURLFull = geoURL + "?zip=" + inputZip + "," + inputCountryCode + "&appid=" + apiKey;
+    //console.log(geoURLFull);
+    //make API call for lat and log
+    fetch(geoURLFull).then(response =>{
         if(!response.ok){
-            throw new Error("Network response error");
+            throw new Error("Network Response Error");
         }
-        //parse JSON data
         return response.json();
     })
-    .then(data=>{
-        //get data from response
-        const lat = data.lat;
-        const lon = data.lon;
-        console.log(lat, "\n");
-        console.log(lon, "\n");
-        const weatherURLFull = weatherURL + "?lat=" + lat +  "&lon=" + lon + "&limit=1&appid=" + apiKey + "&units=imperial"; 
-        console.log(weatherURLFull, "\n");
-        //make 2nd call
-        return fetch(weatherURLFull) 
+    .then(geoData =>{
+        //console.log(geoData);
+        var lat = geoData.lat;
+        var lon = geoData.lon;
+        getWeather(lat, lon);
+        //console.log(lat, lon);
     })
-    //catch errors
-    .catch(error =>{
+    .catch(error => {
         console.error("Error: ", error)
-    })
-    result.then(r=> r.json())
-    .then(data2 =>{
-        const temp = data2.main.temp;
-        const feelsLike = data2.main.feels_like;
-        const min = data2.main.temp_min;
-        const max = data2.main.temp_max;
-        const description = data2.weather[0].description;
-        const windSpeed = data2.wind.speed;
-        outputGeoElement.innerHTML = '<p>Temperature: ${temp}°F</p> <p>Temperature Feels Like: ${feelsLike}</p> <p>Temperature Min: ${min}</p> <p>Temperature Max: ${max}</p> <p>Weather: ${description}</p> ';
-        const avgTemp = getTemp(temp,feelsLike,min,max,windSpeed,description);
-        const clothes = chooseOutfit(avgTemp)
-        
-
     });
 }
+
+function getWeather(lat, lon){
+    var weatherURLFull = weatherURL + "?lat=" + lat +  "&lon=" + lon + "&limit=1&appid=" + apiKey + "&units=imperial"; 
+    //console.log(weatherURLFull);
+    fetch(weatherURLFull).then(response2 =>{
+        if(!response2.ok){
+            throw new Error("Network Response Error");
+        }
+        return response2.json();
+    })
+    .then(weatherData =>{
+        //console.log(weatherData);
+        var temp = weatherData.main.temp;
+        var feelsLike = weatherData.main.feels_like;
+        //console.log(feelsLike);
+        var min = weatherData.main.temp_min;
+        var max = weatherData.main.temp_max;
+        var description = weatherData.weather[0].description;
+        console.log(description);
+        var windSpeed = weatherData.wind.speed;
+        //outputGeoElement.innerHTML = '<p>Temperature: ${temp}°F</p> <p>Temperature Feels Like: ${feelsLike}</p> <p>Temperature Min: ${min}</p> <p>Temperature Max: ${max}</p> <p>Weather: ${description}</p> ';
+        var avgTemp = getTemp(temp,feelsLike,min,max,windSpeed,description);
+        //console.log(avgTemp);
+        var clothes = chooseOutfit(avgTemp)
+    })
+    .catch(error => {
+        console.error("Error: ", error)
+    });
+}
+
+
 
 function chooseOutfit(temp, description){
     //absolutley freezing
