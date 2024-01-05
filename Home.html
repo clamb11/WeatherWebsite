@@ -16,15 +16,28 @@
     </header>
     <section className="search-section">
         <div id="inputContainer">
-            <input type="text" id="inputZip" placeholder="Enter Zip Code: ">
-            <input type="text" id="inputCountryCode" placeholder="Enter 2 letter Country Code: ">
-            <button onclick="getRec()">Get Wardrobe Reccomendation</button>
-            <button onclick="choose('casual')">Casual</button>
-            <button onclick="choose('buisness')">Buisness</button>
-            <button onclick="choose2('fem')">Feminine</button>
-            <button onclick="choose2('masc')">Masculine</button>
+            <div>
+                <label for="">Enter Zip Code</label>
+                <input type="text" name="zip" id="zip" onkeyup=handleInput(this)>
+            </div>
+            <div>
+                <label for="">Enter 2-digit Country Code</label>
+                <input type="text" name="cCode" id="cCode" onkeyup=handleInput(this)>
+            </div>
+            <div>
+                <button onclick="getGeo()">Get Wardrobe Reccomendation</button>
+            </div>
+            <label class="toggle">
+                <input type="checkbox">
+                <span class="slider"></span>
+                <span class="labels" data-bus="Business" data-cas="Casual"></span>
+            </label>
+            <!-- <button onclick="choose2('fem')">Feminine</button>
+            <button onclick="choose2('masc')">Masculine</button> -->
         </div>
     </section>
+ 
+
     
     <div id="recContainer">
         <h2>Wardrobe Reccomendation:</h2>
