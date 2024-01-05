@@ -1,37 +1,66 @@
 
+
 <!DOCTYPE html>
+<!--sets language-->
 <html lang="en">
+<!--head contains metadata-->
 <head>
+    <!--char encoding-->
     <meta charset="UTF-8">
+    <!--sets design feats: size of screen and initial zoom (makes screen readable and look good)-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Sets title (appears in tab and browser bar)-->
     <title>Weather Wardrobe</title>
+    <meta name="author" content="Clare Lambert">
+    <!--Links js and css-->
     <script src="script.js"></script>
     <link rel="stylesheet" href="style.css">
-
-
 </head>
+
+<!--body contains the content of the document-->
 <body>
+    <!--Header set to weather wardrobe within h1 heading -->
     <header>
         <h1>Weather Wardrobe</h1>
     </header>
+    <!--Input section-->
     <section className="search-section">
+        <!--container for inputs-->
         <div id="inputContainer">
+            <!--On is own line it says the label and has text box for user input-->
             <div>
                 <label for="">Enter Zip Code</label>
+                <!--text box calls handle input after each char typed to save zip code-->
                 <input type="text" name="zip" id="zip" onkeyup=handleInput(this)>
             </div>
+            <!--On is own line it says the label and has text box for user input-->
             <div>
                 <label for="">Enter 2-digit Country Code</label>
+                <!--text box calls handle input after each char typed to save country code-->
                 <input type="text" name="cCode" id="cCode" onkeyup=handleInput(this)>
             </div>
+            <!--button on new line and get... text on button-->
             <div>
+                <!--when clicked calls method to get now completed codes and uses for api call-->
                 <button onclick="getGeo()">Get Wardrobe Reccomendation</button>
             </div>
+            <!--cas/bus toggle switch currently displayed under input section-->
             <label class="toggle">
-                <input type="checkbox">
+                <!--uses checkbox then styled into toggle w css-->
+                <input type="checkbox" id="switchValue">
+                <!--spans used for css labels-->
                 <span class="slider"></span>
                 <span class="labels" data-bus="Business" data-cas="Casual"></span>
             </label>
+            <!--Slider to get in user runs hot or cold-->
+            <div class="slidecontainer">
+                <label for="">Are you usually cold or hot?</label>
+                <!--min/max for range, value for initial value and oninput updates paragraph id value-->
+                <input type="range" min="0" max="100" value="50" class="range blue" oninput="rangeValue.innerText = getTempSelect(this.value)">
+                <!--paragraph element which is updated-->
+                <p id ="rangeValue">Average</p>
+            </div>
+
             <!-- <button onclick="choose2('fem')">Feminine</button>
             <button onclick="choose2('masc')">Masculine</button> -->
         </div>
