@@ -6,7 +6,7 @@ const data = {};
 
 const geoURL= "http://api.openweathermap.org/geo/1.0/zip";
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather";
-const apiKey = "4d5bfce61bb0bfcb407e7e53221ed5d0"
+const apiKey = ""
 const outputGeoElement = document.getElementById("weather-output");
 
 //this saves the input to the name after each letter typed
