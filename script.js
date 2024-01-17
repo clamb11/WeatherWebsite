@@ -1,31 +1,34 @@
+//used to hold user input 
 var inputZip = "";
 var inputCountryCode = "";
-var mood;
-var gender;
+//used to hold zip and cCode from user
 const data = {};
-var tempSelection;
-
+//business or casual == mood
+var mood;
+// not used yet -> may use different pages for each gender
+var gender;
+//used to hold the choosen outfit numbers and get pictures
+const tempValues = {};
+// used for normall hot/cold -> needs to be initialized at 0
+var tempSelection = 0;
+// api url that needs zip and cCode
 const geoURL= "http://api.openweathermap.org/geo/1.0/zip";
+// api url that needs lat and lon
 const weatherURL = "https://api.openweathermap.org/data/2.5/weather";
-const apiKey = ""
+const apiKey = "4d5bfce61bb0bfcb407e7e53221ed5d0"
+//Not used??? 
 const outputGeoElement = document.getElementById("weather-output");
-
-
 var slider = document.getElementById("myRange");
 var output = document.getElementById("demo");
-//output.innerHTML = slider.value; // Display the default slider value
 
-// Update the current slider value (each time you drag the slider handle)
-// slider.oninput = function() {
-//   output.innerHTML = this.value;
 
-// }
 
-//this saves the input to the name after each letter typed
+//called by html and saves the input to the name after each letter typed
 function handleInput(temp){
     data[temp.name] = temp.value
 }
 
+//this gets the entire input of zip and cCode -> not used???
 function submitInput(){
     inputZip = data.zip;
     inputCountryCode = data.cCode;
@@ -33,6 +36,7 @@ function submitInput(){
     // console.log(inputZip);
 }
 
+// called by html to get if user runs hot or cold
 function getTempSelect(value){
     if(value <=10){
         tempSelection = -10;
@@ -70,12 +74,12 @@ function getTempSelect(value){
     }
 }
 
+
+//called by html to make first api call and get lat and lon using user input
 function getGeo(){
     //zip and cCode input for URL
     inputZip = data.zip;
     inputCountryCode = data.cCode;
-    // console.log(inputCountryCode);
-    // console.log(inputZip);
     //console.log("Input Zip: ", inputZip, "Input Country Code: ", inputCountryCode);
     //Define geo URL
     var geoURLFull = geoURL + "?zip=" + inputZip + "," + inputCountryCode + "&appid=" + apiKey;
@@ -91,7 +95,9 @@ function getGeo(){
         //console.log(geoData);
         var lat = geoData.lat;
         var lon = geoData.lon;
-        getWeather(lat, lon);
+        var cityName = geoData.name;
+        //use these to get weather info and rec
+        getWeather(lat, lon, cityName);
         //console.log(lat, lon);
     })
     .catch(error => {
@@ -99,9 +105,11 @@ function getGeo(){
     });
 }
 
-function getWeather(lat, lon){
+//called by getGeo to get weather info and outfit rec
+function getWeather(lat, lon, name){
     var weatherURLFull = weatherURL + "?lat=" + lat +  "&lon=" + lon + "&limit=1&appid=" + apiKey + "&units=imperial"; 
     //console.log(weatherURLFull);
+    //getting the weather info
     fetch(weatherURLFull).then(response2 =>{
         if(!response2.ok){
             throw new Error("Network Response Error");
@@ -109,29 +117,48 @@ function getWeather(lat, lon){
         return response2.json();
     })
     .then(weatherData =>{
-        //console.log(weatherData);
+        console.log(weatherData);
+        //saving the important info returned from api
         var temp = weatherData.main.temp;
+        //to display temp on website
+        var currentTemp = document.getElementById("currTemp");
+        currentTemp.textContent = "Current Tempature: " + weatherData.main.temp + "°F for " + name;
         var feelsLike = weatherData.main.feels_like;
         //console.log(feelsLike);
         var min = weatherData.main.temp_min;
         var max = weatherData.main.temp_max;
+        var windSpeed = weatherData.wind.speed;
         var description = weatherData.weather[0].description;
         //console.log(description);
-        var windSpeed = weatherData.wind.speed;
-        //outputGeoElement.innerHTML = '<p>Temperature: ${temp}°F</p> <p>Temperature Feels Like: ${feelsLike}</p> <p>Temperature Min: ${min}</p> <p>Temperature Max: ${max}</p> <p>Weather: ${description}</p> ';
+        //get the text under images that will be changed
+        var shoeRec = document.getElementById("shoeRec");
+        var topRec = document.getElementById("topRec");
+        var coatRec = document.getElementById("coatRec");
+        var bottomRec = document.getElementById("bottomRec");
+        var acc1Rec = document.getElementById("acc1Rec");
+        var acc2Rec = document.getElementById("acc2Rec");
+        //getTemp returns the temp to base the outfit off of -> this is not the actual temp 
         var avgTemp = getTemp(temp,feelsLike,min,max,windSpeed,description, tempSelection);
         //console.log(avgTemp);
-        var clothes = chooseOutfit(avgTemp);
-        //console.log(avgTemp);
-        console.log(clothes);
+        //returns object that contains clothes choosen
+        var clothes = chooseOutfit(avgTemp, description);
+        //console.log(clothes);
+        // change the text under the images to the choosen variable 
+        shoeRec.textContent = "Shoe Recommendation: "  + clothes.Shoes;
+        topRec.textContent = "Top Recommendation: "  + clothes.Top;
+        coatRec.textContent = "Coat Recommendation: "  + clothes.Coat;
+        bottomRec.textContent = "Bottom Recommendation: "  + clothes.Bottom;
+        acc1Rec.textContent = "Accessories Recommendation: "  + clothes.Accesories1;
+        acc2Rec.textContent = "Accessories Recommendation: "  + clothes.Accesories2;
+
         //console.log(tempSelection);
-        displayOutfit(clothes);
     })
     .catch(error => {
         console.error("Error: ", error)
     });
 }
 
+//called by chooseOutfit -> checks if toggle checkbox is checked and sets mood 
 function getToggleState(isChecked){
     //console.log(isChecked);
     if(isChecked == true){
@@ -146,17 +173,17 @@ function getToggleState(isChecked){
     }
 }
 
-
+//called by getWeather -> takes in info and reyruns an outfir object 
 function chooseOutfit(temp, description){
-    console.log(tempSelection)
+    console.log(temp)
     mood = getToggleState(document.getElementById("switchValue").checked);
-    //even numbers are business and odd are casual
+    //even numbers are business and odd are casual; lower nums for colder weather & higher for hotter
     var tops = {
-        0: "Turtle Neck and Sweater",
+        0: "Turtle Neck and Blazer",
         1: "Long Sleeve and Hoodie",
-        2: "Button up and Blazer",
+        2: "Button up and Sweater",
         3: "Long Sleeve and Sweatshirt",
-        4: "Warm Sweater",
+        4: "Sweater",
         5: "Short Sleeve and Sweatshirt",
         6: "Turtle Neck and Cardigan",
         7: "Short Sleeve and Hoodie", 
@@ -169,7 +196,7 @@ function chooseOutfit(temp, description){
         14: "Dress"
         
     };
-    //even numbers are business odd are casual
+    //even numbers are business odd are casual; lower nums for colder weather & higher for hotter
     var bottoms = {
         0: "Chinos",
         1: "Sweatpants",
@@ -185,9 +212,10 @@ function chooseOutfit(temp, description){
         11: "Jean Shorts",
         12: "Skirt",
         13: "Biker Shorts",
-        14: "No Pants"
+        14: "Tights",
+        15: "None"
     };
-    //even numbers are business odd are casual
+    //even numbers are business odd are casual; lower nums for colder weather & higher for hotter
     var coats = {
         0: "Winter Coat",
         1: "Winter Coat",
@@ -202,6 +230,7 @@ function chooseOutfit(temp, description){
         10: "No Jacket",
         11: "Rain Jacket"
     };
+    // lower nums for colder weather & higher for hotter
     var accesories = {
         0: "Winter Hat",
         1: "Scarf",
@@ -210,7 +239,7 @@ function chooseOutfit(temp, description){
         4: "Sunglasses",
         5: "None"
     };
-    //even numbers are casual odd are business
+    //even numbers are casual odd are business; lower nums for colder weather & higher for hotter
     var shoes = {
         0: "Boots",
         1: "Boots",
@@ -222,280 +251,353 @@ function chooseOutfit(temp, description){
         7: "Flats",
     };
 
-
-
-    //absolutley freezing
+    //absolutley freezing & business
     if(temp < 20 && mood == "business"){
-        var absFrezTop = getRandEvenNum(0,4);
-        var absFrezTopValue = tops[absFrezTop];
-        //console.log(absFrezTopValue);
-        var absFrezBottom = getRandEvenNum(0,7);
-        var absFrezBottomValue = bottoms[absFrezBottom];
-        //console.log(absFrezBottomValue);
-        var absFrezCoat = getRandNum(0,1);
-        var absFrezCoatValue = coats[absFrezCoat];
-        //console.log(absFrezCoatValue);
-        var absFrezAccesories = getRandNum(0,1);
-        var absFrezAccesoriesValue1 = accesories[absFrezAccesories];
-        var absFrezAccesoriesValue2 = accesories[2];
-        var absFrezShoesValue = shoes[1];
-        return "Coat: " + absFrezCoatValue + "\nTop: " + absFrezTopValue + "\nBottom: " + absFrezBottomValue + "\nAccesories: " + absFrezAccesoriesValue1 + ", " + absFrezAccesoriesValue2 + "\nShoes: " + absFrezShoesValue;
-    } 
+        var tempTop = getRandEvenNum(0,4);
+        //console.log(TopValue);
+        var tempBottom = getRandEvenNum(0,7);
+        //console.log(BottomValue);
+        var tempCoat = getRandEvenNum(0,1);
+        //console.log(CoatValue);
+        var tempAccesories = getRandNum(0,1);
+        var tempAccesories2 = 2;
+        var tempShoes = 1;
+        console.log(tempAccesories);
+        } 
+
+    //absolutley freezing & casual    
     else if(temp < 20 && mood == "casual"){
-        var absFrezTop = getRandOddNum(0,4);
-        //console.log(absFrezTop);
-        var absFrezTopValue = tops[absFrezTop];
-        //console.log(absFrezTopValue);
-        var absFrezBottom = getRandOddNum(0,7);
-        var absFrezBottomValue = bottoms[absFrezBottom];
-        //console.log(absFrezTopValue);
-        var absFrezCoat = getRandNum(0,1);
-        var absFrezCoatValue = coats[absFrezCoat];
-        console.log(absFrezCoatValue);
-        var absFrezAccesories = getRandNum(0,1);
-        var absFrezAccesoriesValue1 = accesories[absFrezAccesories];
-        var absFrezAccesoriesValue2 = accesories[2];
-        var absFrezShoesValue = shoes[0];
-        return "Coat: " + absFrezCoatValue + "\nTop: " + absFrezTopValue + "\nBottom: " + absFrezBottomValue + "\nAccesories: " + absFrezAccesoriesValue1 + ", " + absFrezAccesoriesValue2 + "\nShoes: " + absFrezShoesValue;
-    } 
-    //freezing
+        var tempTop = getRandOddNum(0,4);
+        //console.log(Top);
+        //console.log(TopValue);
+        var tempBottom = getRandOddNum(0,7);
+        //console.log(TopValue);
+        var tempCoat = getRandNum(0,1);
+        //console.log(CoatValue);
+        var tempAccesories = getRandNum(0,1);
+        var tempAccesories2 = 2;
+        var tempShoes = 0;
+        console.log(tempAccesories);
+        } 
+
+    //freezing & business
     else if(temp >= 20 && temp < 32 && mood == "business"){
-        var FrezTop = getRandEvenNum(0,4);
-        var FrezTopValue = tops[FrezTop];
-        //console.log(FrezTopValue);
-        var FrezBottom = getRandEvenNum(0,7);
-        var FrezBottomValue = bottoms[FrezBottom];
-        //console.log(FrezTopValue);
-        var FrezCoat = getRandNum(0,5);
-        var FrezCoatValue = coats[FrezCoat];
-        //console.log(FrezCoatValue);
-        var FrezAccesories = getRandNum(0,1);
-        var FrezAccesoriesValue1 = accesories[FrezAccesories];
-        var FrezAccesoriesValue2 = accesories[2];
-        var FrezShoes = getRandOddNum(0,4);
-        var FrezShoesValue = shoes[FrezShoes];
-        return "Coat: " + FrezCoatValue + "\nTop: " + FrezTopValue + "\nBottom: " + FrezBottomValue + "\nAccesories: " + FrezAccesoriesValue1 + ", " + FrezAccesoriesValue2 + "\nShoes: " + FrezShoesValue;
-    
+        var tempTop = getRandEvenNum(0,4);
+        //console.log(TopValue);
+        var tempBottom = getRandEvenNum(0,7);
+        //console.log(TopValue);
+        var tempCoat = getRandEvenNum(0,5);
+        //console.log(CoatValue);
+        var tempAccesories = getRandNum(0,1);
+        var tempAccesories2 = 2;
+        var tempShoes = getRandOddNum(0,4);
+       
     }
+    //freezing & casual
     else if(temp >= 20 && temp < 32 && mood == "casual"){
-        var FrezTop = getRandOddNum(0,4);
-        var FrezTopValue = tops[FrezTop];
-        //console.log(FrezTopValue);
-        var FrezBottom = getRandOddNum(0,7);
-        var FrezBottomValue = bottoms[FrezBottom];
-        //console.log(FrezTopValue);
-        var FrezCoat = getRandNum(0,5);
-        var FrezCoatValue = coats[FrezCoat];
-        //console.log(FrezCoatValue);
-        var FrezAccesories = getRandNum(0,1);
-        var FrezAccesoriesValue1 = accesories[FrezAccesories];
-        var FrezAccesoriesValue2 = accesories[2];
-        var FrezShoes = getRandEvenNum(0,4);
-        var FrezShoesValue = shoes[FrezShoes];
-        return "Coat: " + FrezCoatValue + "\nTop: " + FrezTopValue + "\nBottom: " + FrezBottomValue + "\nAccesories: " + FrezAccesoriesValue1 + ", " + FrezAccesoriesValue2 + "\nShoes: " + FrezShoesValue;
-    }
-    //cold
+        var tempTop = getRandOddNum(0,4);
+        //console.log(TopValue);
+        var tempBottom = getRandOddNum(0,7);
+        //console.log(TopValue);
+        var tempCoat = getRandNum(0,5);
+        //console.log(CoatValue);
+        var tempAccesories = getRandNum(0,1);
+        var tempAccesories2 = 2;
+        var tempShoes = getRandEvenNum(0,4);
+        }
+    //very cold & business
     else if(temp >= 32 && temp < 47 && mood == "business"){
-        var coldTop = getRandEvenNum(0,7);
-        var coldTopValue = tops[coldTop];
-        //console.log(FrezTopValue);
-        var coldBottom = getRandEvenNum(0,7);
-        var coldBottomValue = bottoms[coldBottom];
-        //console.log(FrezTopValue);
-        var coldCoat = getRandNum(2,9);
-        var coldCoatValue = coats[coldCoat];
-        //console.log(FrezCoatValue);
-        var coldShoes = getRandOddNum(0,4);
-        var coldShoesValue = shoes[coldShoes];
-        return "Coat: " + coldCoatValue + "\nTop: " + coldTopValue + "\nBottom: " + coldBottomValue + "\nShoes: " + coldShoesValue;
+        var tempTop = getRandEvenNum(0,7);
+        //console.log(TopValue);
+        var tempBottom = getRandEvenNum(0,7);
+        //console.log(TopValue);
+        var tempCoat = getRandNum(2,9);
+        //console.log(CoatValue);
+        var tempShoes = getRandOddNum(0,4);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
     }
+    //very cold & casual
     else if(temp >= 32 && temp < 47 && mood == "casual"){
-        var coldTop = getRandOddNum(0,7);
-        var coldTopValue = tops[coldTop];
-        console.log(coldTopValue);
-        var coldBottom = getRandOddNum(0,7);
-        var coldBottomValue = bottoms[coldBottom];
-        //console.log(coldTopValue);
-        var coldCoat = getRandNum(2,9);
-        var coldCoatValue = coats[coldCoat];
-        //console.log(coldCoatValue);
-        var coldShoes = getRandEvenNum(0,4);
-        var coldShoesValue = shoes[coldShoes];
-        return "Coat: " + coldCoatValue + "\nTop: " + coldTopValue + "\nBottom: " + coldBottomValue + "\nShoes: " + coldShoesValue;
+        var tempTop = getRandOddNum(0,7);
+        //console.log(TopValue);
+        var tempBottom = getRandOddNum(0,7);
+        //console.log(TopValue);
+        var tempCoat = getRandNum(2,9);
+        //console.log(CoatValue);
+        var tempShoes = getRandEvenNum(0,4);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
     }
-     //mild
+     //cold & business
      else if(temp >= 47 && temp < 55 && mood == "business"){
-        var mildTop = getRandEvenNum(5,13);
-        var mildTopValue = tops[mildTop];
-        //console.log(FrezTopValue);
-        var mildBottom = getRandEvenNum(0,7);
-        var mildBottomValue = bottoms[mildBottom];
-        //console.log(FrezTopValue);
-        var mildCoat = getRandNum(4,9);
-        if(mildTop == 6){
-            mildCoatValue = 10;
+        var tempTop = getRandEvenNum(5,13);
+        //console.log(TopValue);
+        var tempBottom = getRandEvenNum(0,7);
+        //console.log(TopValue);
+        //if top is turtle neck and cardigan no coat needed
+        if(tempTop == 6){
+            tempCoat = 10;
+        }else{
+            var tempCoat = getRandEvenNum(4,9);
         }
-        var mildCoatValue = coats[mildCoat];
+        //if raining, need raincoat
         if(description.includes("rain") || description.includes("thunderstorm")){
-            mildCoatValue = coats[11];
+            tempCoat = 11;
         }
-        //console.log(FrezCoatValue);
-        var mildShoes = getRandOddNum(0,5);
-        var mildShoesValue = shoes[mildShoes];
-        return "Jacket: " + mildCoatValue + "\nTop: " + mildTopValue + "\nBottom: " + mildBottomValue + "\nShoes: " + mildShoesValue;
+        //console.log(CoatValue);
+        var tempShoes = getRandOddNum(0,5);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
     }
+    // cold & casual
     else if(temp >= 47 && temp < 55 && mood == "casual"){
-        var mildTop = getRandOddNum(5,13);
-        var mildTopValue = tops[mildTop];
-        //console.log(FrezTopValue);
-        var mildBottom = getRandOddNum(0,7);
-        var mildBottomValue = bottoms[mildBottom];
-        //console.log(FrezTopValue);
-        var mildCoat = getRandNum(4,9);
-        if(mildTop == 5 || mildTop == 7){
-            mildCoatValue = 10;
+        var tempTop = getRandOddNum(5,13);
+        //console.log(TopValue);
+        var tempBottom = getRandOddNum(0,7);
+        //console.log(TopValue);
+        //if top has hoodie or sweatshirt no coat needed 
+        if(tempTop == 5 || tempTop == 7){
+            tempCoat = 10;
+        }else{
+            var tempCoat = getRandOddNum(4,9);
         }
-        var mildCoatValue = coats[mildCoat];
+        //if raining, need raincoat
         if(description.includes("rain") || description.includes("thunderstorm")){
-            mildCoatValue = coats[11];
+            tempCoat = 11;
         }
-        //console.log(FrezCoatValue);
-        var mildShoes = getRandEvenNum(0,5);
-        var mildShoesValue = shoes[mildShoes];
-        return "Jacket: " + mildCoatValue + "\nTop: " + mildTopValue + "\nBottom: " + mildBottomValue + "\nShoes: " + mildShoesValue;
+        //console.log(CoatValue);
+        var tempShoes = getRandEvenNum(0,5);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
     }
-    //moderate
+    //moderate & business
     else if(temp >= 55 && temp < 64 && mood == "business"){
-        var modTop = getRandEvenNum(7,13);
-        var modTopValue = tops[modTop];
-        //console.log(FrezTopValue);
-        var modBottom = getRandEvenNum(2,8);
-        var modBottomValue = bottoms[modBottom];
-        //console.log(FrezTopValue);
-        var modCoat = getRandNum(6,9);
-        var modCoatValue = coats[modCoat];
+        var tempTop = getRandEvenNum(7,13);
+        //console.log(TopValue);
+        var tempBottom = getRandEvenNum(2,8);
+        //console.log(TopValue);
+        var tempCoat = getRandEvenNum(6,9);
+        //if raining, need raincoat
         if(description.includes("rain") || description.includes("thunderstorm")){
-            modCoatValue = coats[11];
+            tempCoat = 11;
         }
-        //console.log(FrezCoatValue);
-        var modShoes = getRandOddNum(0,5);
-        var modShoesValue = shoes[modShoes];
-        return "Jacket: " + modCoatValue + "\nTop: " + modTopValue + "\nBottom: " + modBottomValue + "\nShoes: " + modShoesValue;
-   
+        //console.log(CoatValue);
+        var tempShoes = getRandOddNum(0,5);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
 
     }
+    //moderate & casual
     else if(temp >= 55 && temp < 64 && mood == "casual"){
-        var modTop = getRandOddNum(5,13);
-        var modTopValue = tops[modTop];
-        //console.log(FrezTopValue);
-        var modBottom = getRandOddNum(2,8);
-        var modBottomValue = bottoms[modBottom];
-        //console.log(FrezTopValue);
-        var modCoat = getRandNum(2,9);
-        if(modTop == 5 || modTop == 7){
-            modCoatValue = 10;
+        var tempTop = getRandOddNum(5,13);
+        //console.log(TopValue);
+        var tempBottom = getRandOddNum(2,8);
+        //console.log(TopValue);
+        //if top has hoodie or sweatshirt no coat needed 
+        if(tempTop == 5 || tempTop == 7){
+            tempCoat = 10;
+        }else{
+            var tempCoat = getRandOddNum(2,9);
         }
-        var modCoatValue = coats[modCoat];
+        //if raining, need raincoat
         if(description.includes("rain") || description.includes("thunderstorm")){
-            modCoatValue = coats[11];
+            tempCoat = 11;
         }
-        //console.log(FrezCoatValue);
-        var modShoes = getRandEvenNum(0,5);
-        var modShoesValue = shoes[modShoes];
-        var modAccesories = getRandNum(3,4);
-        var modAccesoriesValue = accesories[modAccesories];
+        //console.log(CoatValue);
+        var tempShoes = getRandEvenNum(0,5);
+        var tempAccesories = getRandNum(3,4);
+        var tempAccesories2 = 5;
         
-        return "Jacket: " + modCoatValue + "\nTop: " + modTopValue + "\nBottom: " + modBottomValue + "\nShoes: " + modShoesValue + "\nAccesories: " + modAccesoriesValue;
-   
-
+       
     }
-     //warm
+     //warm & business
      else if(temp >= 64 && temp < 75 && mood == "business"){
-        var warmTop = getRandEvenNum(9,14);
-        var warmTopValue = tops[warmTop];
-        //console.log(FrezTopValue);
-        if(warmTop == 14){
-            warmBottom == 14;
+        var tempTop = getRandEvenNum(9,14);
+        //console.log(TopValue);
+        //if top is dress them bottoms are tights
+        if(tempTop == 14){
+            tempBottom == 14;
         }
-        if(warmTop == 10){
-           var warmBottom = getRandEvenNum(8,13);
+        //if top is long sleeve choose lighter bottoms 
+        if(tempTop == 10){
+           var tempBottom = getRandEvenNum(8,13);
         }
         else{
-            var warmBottom = getRandEvenNum(2,13);
+            var tempBottom = getRandEvenNum(2,13);
         }
-        var warmBottomValue = bottoms[warmBottom];
-        //console.log(FrezTopValue);
-        var warmCoat = 10;
-        var warmCoatValue = coats[warmCoat];
+        //console.log(TopValue);
+        //no coat needed 
+        var tempCoat = 10;
+        //if raining, need raincoat
         if(description.includes("rain") || description.includes("thunderstorm")){
-            warmCoatValue = coats[11];
+            tempCoat = 11;
         }
-        //console.log(FrezCoatValue);
-        var warmShoes = getRandOddNum(0,7);
-        var warmShoesValue = shoes[warmShoes];
-        return "Jacket: " + warmCoatValue + "\nTop: " + warmTopValue + "\nBottom: " + warmBottomValue + "\nShoes: " + warmShoesValue;
-   
+        //console.log(CoatValue);
+        var tempShoes = getRandOddNum(0,7);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
  
      }
+     //warm & casual
     else if(temp >= 64 && temp < 75 && mood == "casual"){
-        var warmTop = getRandOddNum(9,14);
-        var warmTopValue = tops[warmTop];
-        if(warmTop == 14){
-            warmBottom == 14;
-        }
-        if(warmTop == 10){
-           var warmBottom = getRandOddNum(8,13);
+        var tempTop = getRandOddNum(9,14);
+        //if top is long sleeve choose lighter bottoms 
+        if(tempTop == 9){ 
+           var tempBottom = getRandOddNum(8,13);
         }
         else{
-            var warmBottom = getRandOddNum(2,13);
+            var tempBottom = getRandOddNum(2,13);
         }
-        var warmBottomValue = bottoms[warmBottom];
-        var warmCoat = 10;
-        var warmCoatValue = coats[warmCoat];
+        //no coat needed 
+        var tempCoat = 10;
+        //if raining, need raincoat
         if(description.includes("rain") || description.includes("thunderstorm")){
-            warmCoatValue = coats[11];
+            tempCoat = 11;
         }
-        var warmShoes = getRandEvenNum(0,7);
-        var warmShoesValue = shoes[warmShoes];
-        var warmAccesories = getRandNum(3,4);
-        var warmAccesoriesValue = accesories[warmAccesories];
-        return "Jacket: " + warmCoatValue + "\nTop: " + warmTopValue + "\nBottom: " + warmBottomValue + "\nShoes: " + warmShoesValue + "\nAccesories: " + warmAccesoriesValue;
-   
+        var tempShoes = getRandEvenNum(0,7);
+        var tempAccesories = getRandNum(3,4);
+        var tempAccesories2 = 5;
  
     }
-    //very warm
+    //very warm & business
     else if(temp >= 75 && temp < 86 && mood == "business"){
-
+        var tempTop = getRandEvenNum(11,14);
+        //if top is dress them bottoms are tights
+        if(tempTop == 14){
+            tempBottom == 14;
+        }else{
+            var tempBottom = getRandEvenNum(2,13);
+        }
+        //no coat needed 
+        var tempCoat = 10;
+        //if raining, need raincoat
+        if(description.includes("rain") || description.includes("thunderstorm")){
+            tempCoat = 11;
+        }
+        var tempShoes = getRandOddNum(0,7);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
     }
+    //very warm & casual
     else if(temp >= 75 && temp < 86 && mood == "casual"){
+        var tempTop = getRandOddNum(11,14);
+        var tempBottom = getRandOddNum(9,13);
+        //no coat needed 
+        var tempCoat = 10;
+        //if raining, need raincoat
+        if(description.includes("rain") || description.includes("thunderstorm")){
+            tempCoat = 11;
+        }
+        var tempShoes = getRandEvenNum(2,7);
+        var tempAccesories = getRandNum(3,5);
+        var tempAccesories2 = 5;
 
     }
-     //hot
+     //hot & business
      else if(temp >= 86 && temp < 99 && mood == "business"){
+        var tempTop = getRandEvenNum(11,14);
+        //if top is dress them bottoms are tights
+        if(tempTop == 14){
+            tempBottom == 15;
+        }else{
+            var tempBottom = getRandEvenNum(8,13);
+        }
+        //no coat needed 
+        var tempCoat = 10;
+        var tempShoes = getRandOddNum(0,7);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
        
     }
+    //hot & casual
     else if(temp >= 86 && temp < 99 && mood == "casual"){
-       
+        var tempTop = getRandOddNum(11,14);
+        var tempBottom = getRandOddNum(9,13);
+        //no coat needed 
+        var tempCoat = 10;
+        var tempShoes = getRandEvenNum(2,7);
+        var tempAccesories = getRandNum(3,5);
+        if(tempAccesories == 3){
+            var tempAccesories2 = getRandNum(4,5);
+        }
+        else{
+            var tempAccesories2 = 5;
+        }
     }
-     //very hot
+     //very hot & business
      else if(temp >= 99 && mood == "business"){
+        var tempTop = getRandEvenNum(11,14);
+        //if top is dress them bottoms are tights
+        if(tempTop == 14){
+            tempBottom == 15;
+        }else{
+            var tempBottom = getRandEvenNum(8,13);
+        }
+        //no coat needed 
+        var tempCoat = 10;
+        var tempShoes = getRandOddNum(0,7);
+        var tempAccesories = 5;
+        var tempAccesories2 = 5;
         
     }
-     //very hot
+     //very hot & casual
      else if(temp >= 99 && mood == "casual"){
         
      }
+     //used in the returned clothes object
+     var TopValue = tops[tempTop];
+     var BottomValue = bottoms[tempBottom];
+     var CoatValue = coats[tempCoat];
+     var AccesoriesValue1 = accesories[tempAccesories];
+     var AccesoriesValue2 = accesories[tempAccesories2];
+     var ShoesValue = shoes[tempShoes];
+
+     //what is returned 
+     var clothes = {
+        Coat: CoatValue,
+        Top: TopValue,
+        Bottom: BottomValue,
+        Accesories1: AccesoriesValue1, 
+        Accesories2: AccesoriesValue2,
+        Shoes: ShoesValue
+    }
+    
+    //saves numbers of each clothes obj to use for image
+    tempValues.top = tempTop;
+    tempValues.bottom = tempBottom;
+    tempValues.coat = tempCoat;
+    tempValues.acc1 = tempAccesories;
+    tempValues.acc2 = tempAccesories2;
+    tempValues.shoes = tempShoes;
+
+    console.log(TopValue);
+    console.log(tempAccesories);
+
+    
+    return clothes;
+
 
 }
 
+
+
 function getTemp(temp, feelsLike, min, max, windSpeed, description, tempSelection){
-    //console.log(temp);
+    var windtemp = temp;
+    console.log("temp: " + temp);
     const firstAvg = (min + max)/2;
-    //console.log(firstAvg);
-    //console.log(feelsLike);
+    console.log(firstAvg);
     const tempAvg = (firstAvg + feelsLike + temp)/3;
-    const windtemp = 35.74 + .6215 * tempAvg - 35.75 * Math.pow(windSpeed, .16) + .4275 * tempAvg * Math.pow(windSpeed, .16);
+    console.log(tempAvg);
+    console.log(windSpeed);
+    if(windSpeed != 0){
+        windtemp = 35.74 + (.6215 * tempAvg)- (35.75 * Math.pow(windSpeed, .16)) + (.4275 * tempAvg * Math.pow(windSpeed, .16)); 
+    }else{
+        windtemp = tempAvg;
+    }
+    console.log(windtemp);
     const returnVal = windtemp + tempSelection;
+    console.log(returnVal);
     // if(description.includes("thunderstorm")){
     //     windtemp -= 3; 
     // }else if(description.includes("rain")){
@@ -503,6 +605,7 @@ function getTemp(temp, feelsLike, min, max, windSpeed, description, tempSelectio
     // }else if(description.includes("clear")){
     //     windtemp += 5;
     // }
+
     return returnVal;    
 
 }
@@ -538,15 +641,29 @@ function getRandNum(min, max){
     return Math.floor(Math.random() * (max - min +1)) + min;
 }
 
-function displayOutfit(data){
-    // const top = data.tops;
-    // const topDiv = document.getElementById("Top");
-    // const heading = document.createElement("h1");
-    // heading.innerHTML = top;
-    // topDiv.appendChild(heading);
-    // const topImg = document.createElement("img");
-    // topImg.src = top;
-    // topDiv.appendChild(topImg);
-    // document.body.style.backgroundImage = "url()";
 
+function changeTopImg(img){
+    var tempNum = tempValues.top;
+    document.getElementById("TopImg").src = img.src.replace("blank.JPG", "top" + tempNum + ".jpg");  
+}
+
+function changeCoatImg(img){
+    var tempNum = tempValues.coat;
+    document.getElementById("CoatImg").src = img.src.replace("blank.JPG", "coat" + tempNum + ".jpg");
+}
+function changeBottomImg(img){
+    var tempNum = tempValues.bottom;
+    document.getElementById("BottomImg").src = img.src.replace("blank.JPG", "bottom"+ tempNum + ".jpg");
+}
+function changeShoesImg(img){
+    var tempNum = tempValues.shoes;
+    document.getElementById("ShoesImg").src = img.src.replace("blank.JPG", "shoes" + tempNum + ".jpg");
+}
+function changeAcc1Img(img){
+    var tempNum = tempValues.acc1;
+    document.getElementById("Acc1Img").src = img.src.replace("blank.JPG", "acc1"+ tempNum + ".jpg");
+}
+function changeAcc2Img(img){
+    var tempNum = tempValues.acc2;
+    document.getElementById("Acc2Img").src = img.src.replace("blank.JPG", "acc2" + tempNum + ".jpg");
 }
