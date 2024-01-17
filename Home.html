@@ -50,7 +50,7 @@
                 <span class="slider"></span>
                 <span class="labels" data-bus="Business" data-cas="Casual"></span>
             </label>
-            <!--Slider to get in user runs hot or cold-->
+            <!--Slider to get if user runs hot or cold-->
             <div class="slidecontainer">
                 <label for="">Are you usually cold or hot?</label>
                 <!--min/max for range, value for initial value and oninput updates paragraph id value-->
@@ -68,6 +68,53 @@
     
     <div id="recContainer">
         <h2>Wardrobe Reccomendation:</h2>
+        <h3>Current Tempature:</h3>
+        <div id="currTemp"></div>
+        <h3>Click for reveal</h3>
+        <div class="responsive">
+            <div class="gallery">
+                <img id="CoatImg" src="imgs/coat/blank.JPG" alt="Coat" onclick="changeCoatImg(this)">
+              <div id="coatRec" class="desc">Coat Reccomendation: ?</div>
+            </div>
+          </div>
+          
+          <div class="responsive">
+            <div class="gallery">
+                <img id="TopImg" src="imgs/top/blank.JPG" alt="Top" onclick="changeTopImg(this)">
+              <div id="topRec" class="desc">Top Reccomendation: ?</div>
+            </div>
+          </div>
+          
+          <div class="responsive">
+            <div class="gallery">
+                <img id="BottomImg" src="imgs/bottom/blank.JPG" alt="Bottoms" onclick="changeBottomImg(this)">
+              
+              <div id="bottomRec" class="desc">Bottoms Reccomendation: ?</div>
+            </div>
+          </div>
+          
+          <div class="responsive">
+            <div class="gallery">
+                <img id="ShoesImg" src="imgs/shoes/blank.JPG" alt="Shoes" onclick="changeShoesImg(this)">
+              <div id="shoeRec" class="desc">Shoe Reccomendation: ?</div>
+            </div>
+          </div>
+
+          <div class="responsive">
+            <div class="gallery">
+                <img id="Acc1Img" src="imgs/acc1/blank.JPG" alt="Acc1" onclick="changeAcc1Img(this)">
+              <div id="acc1Rec" class="desc">Accessories Reccomendation: ?</div>
+            </div>
+          </div>
+
+          <div class="responsive">
+            <div class="gallery">
+                <img id="Acc2Img" src="imgs/acc2/blank.JPG" alt="Acc2" onclick="changeAcc2Img(this)">
+              <div id="acc2Rec" class="desc">Accessories Reccomendation: ?</div>
+            </div>
+          </div>
+
+          <div class="clearfix"></div>
         
     </div>
 </body>
